@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "centos/7"
+
+    config.vm.define "aapricotS" do |control|
+        control.vm.hostname = "aapricotS"
+        control.vm.network "private_network", ip: "192.168.56.110"
+        control.vm.provider "virtualbox" do |v|
+            v.customize ["modifyvm", :id, "--name", "aapricotS"]
+            v.auto_nat_dns_proxy = false
+            v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+            v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+            v.memory = 1024
+            v.cpus = 1
+        end
+    # config.vm.provision :shell, :inline => SHELL
+
+    # SHELL
+    #     control.vm.provision "shell", path: 
+    end
+    config.vm.define "aapricotW" do |control|
+        control.vm.hostname = "aapricotW"
+        control.vm.network "private_network", ip: "192.168.56.111"
+        control.vm.provider "virtualbox" do |v|
+            v.customize ["modifyvm", :id, "--name", "aapricotW"]
+            v.auto_nat_dns_proxy = false
+            v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+            v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+            v.memory = 1024
+            v.cpus = 1
+        end
+    # config.vm.provision :shell, :inline => SHELL
+
+    # SHELL
+    #     control.vm.provision "shell", path: 
+    end
+end
