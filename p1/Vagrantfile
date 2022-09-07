@@ -1,11 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# $token = "K106fef5f50a27f06e7f0c4dfb33ecc45335ad34997a0f4dfd4531d4cb1fae65396::server:297af1512f22db9c71650748783481c6"
-
 Vagrant.configure("2") do |config|
-    config.vm.box_url = "file:///Users/aapricot/goinfre/CentOS-7-x86_64-Vagrant-2004_01.VirtualBox.box"
-    config.vm.box = "centos/7"
+    config.vm.box_url = "file:///Users/aapricot/goinfre/CentOS-Stream-Vagrant-8-20210210.0.x86_64.vagrant-virtualbox.box"
+    config.vm.box = "centos/stream8"
 
     config.vm.define "aapricotS" do |control|
         control.vm.hostname = "aapricotS"
@@ -18,49 +16,28 @@ Vagrant.configure("2") do |config|
             v.memory = 1024
             v.cpus = 1
         end
-        control.vm.provision :shell, inline: "sudo yum update -y & yum upgrade -y"
+        control.vm.provision :shell, inline: "sudo dnf update -y"
         control.vm.provision :file, source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/id_rsa.pub"
         control.vm.provision :file, source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
         control.vm.provision :shell, inline: "cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys"
-        control.vm.provision :shell, inline: "curl -sfL https://get.k3s.io | sh -s - --no-deploy traefik --write-kubeconfig-mode 644 --node-name k3s-master-01 --node-external-ip 192.168.56.110 --node-ip 192.168.56.110"
-        # control.vm.provision :shell, inline: "sudo echo $token > /var/lib/rancher/k3s/server/node-token"
-        # control.vm.provision :shell do |s|
-        #     # s.inline = "sudo yum update -y & yum upgrade -y"
-        #     # s.inline = "curl -sfL https://get.k3s.io | sh -s - --no-deploy traefik --write-kubeconfig-mode 644 --node-name k3s-master-01"
-        #     s.inline = "sudo echo $1 > /var/lib/rancher/k3s/server/node-token"
-        #     s.args = $token
-        # end
-    # config.vm.provision :shell, :inline => SHELL
-
-    # SHELL
-    #     control.vm.provision "shell", path: 
+        control.vm.provision :shell, inline: "curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 755 --node-name aapricotS --node-ip 192.168.56.110"
     end
     config.vm.define "aapricotW" do |control|
-        control.vm.hostname = "aapricotW"
+        control.vm.hostname = "aapricotSW"
         control.vm.network "private_network", ip: "192.168.56.111"
         control.vm.provider "virtualbox" do |v|
-            v.customize ["modifyvm", :id, "--name", "aapricotW"]
+            v.customize ["modifyvm", :id, "--name", "aapricotSW"]
             v.auto_nat_dns_proxy = false
             v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
             v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
             v.memory = 1024
             v.cpus = 1
         end
-        control.vm.provision :shell, inline: "sudo yum update -y & yum upgrade -y"
+        control.vm.provision :shell, inline: "sudo dnf update -y"
         control.vm.provision :file, source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/id_rsa.pub"
         control.vm.provision :file, source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
         control.vm.provision :shell, inline: "cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys"
         control.vm.provision :shell, inline: "ssh -o StrictHostKeyChecking=no -i /home/vagrant/.ssh/id_rsa vagrant@192.168.56.110 'sudo cat /var/lib/rancher/k3s/server/node-token' > /home/vagrant/token.txt"
-        control.vm.provision :shell, inline: "curl -sfL https://get.k3s.io | K3S_NODE_NAME=k3s-worker-01 K3S_URL=https://192.168.56.110:6443 K3S_TOKEN_FILE=/home/vagrant/token.txt sh -s - --node-ip 192.168.56.111"
-        # control.vm.provision :shell, inline: "sudo echo $token > /var/lib/rancher/k3s/server/node-token"
-        # control.vm.provision :shell do |s|
-        #     # s.inline = "sudo yum update -y & yum upgrade -y"
-        #     s.inline = "curl -sfL https://get.k3s.io | K3S_NODE_NAME=k3s-worker-01 K3S_URL=https://192.168.56.110:6443 K3S_TOKEN=$1 sh - "
-        #     s.args = $token
-        # end
-    # config.vm.provision :shell, :inline => SHELL
-
-    # SHELL
-    #     control.vm.provision "shell", path: 
+        control.vm.provision :shell, inline: "curl -sfL https://get.k3s.io | K3S_NODE_NAME=aapricotSW K3S_URL=https://192.168.56.110:6443 K3S_TOKEN_FILE=/home/vagrant/token.txt sh -s - --node-ip 192.168.56.111"
     end
 end
