@@ -1,0 +1,25 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box_url = "file:///Users/aapricot/goinfre/CentOS-Stream-Vagrant-8-20210210.0.x86_64.vagrant-virtualbox.box"
+    config.vm.box = "centos/stream8"
+
+    config.vm.define "aapricotS" do |control|
+        control.vm.hostname = "aapricotS"
+        control.vm.network "private_network", ip: "192.168.56.110"
+        control.vm.provider "virtualbox" do |v|
+            v.customize ["modifyvm", :id, "--name", "aapricotS"]
+            v.auto_nat_dns_proxy = false
+            v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+            v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+            v.memory = 1024
+            v.cpus = 1
+        end
+        control.vm.provision :shell, inline: "sudo dnf update -y"
+        control.vm.provision :file, source: "~/.ssh/id_rsa.pub", destination: "/home/vagrant/.ssh/id_rsa.pub"
+        control.vm.provision :file, source: "~/.ssh/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
+        control.vm.provision :shell, inline: "cat /home/vagrant/.ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys"
+        control.vm.provision :shell, inline: "curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 755 --node-name aapricotS --node-ip 192.168.56.110"
+    end
+end

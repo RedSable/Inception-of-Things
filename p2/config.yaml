@@ -1,0 +1,21 @@
+apiVersion: v1
+data:
+  index.html: |-
+    <html>
+    <head>
+      <title>Hello World!</title>
+    </head>
+    <body>
+      Hello World!\n
+      <%= MY_NODE_NAME %>
+      <%= MY_PODE_NAME %>
+      <%= MY_PODE_NAMESPACE %>
+    </body>
+    </html>
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2022-09-07T18:49:22Z"
+  name: hello-world
+  namespace: test
+  resourceVersion: "3232"
+  uid: d1332232-6165-4683-8244-2decf4a84984
